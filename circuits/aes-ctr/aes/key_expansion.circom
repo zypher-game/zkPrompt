@@ -1,7 +1,7 @@
 // from: https://github.com/crema-labs/aes-circom/tree/main/circuits
 pragma circom 2.1.6;
 
-include "../utils.circom";
+include "../../utils/utils.circom";
 include "sbox128.circom";
 
 

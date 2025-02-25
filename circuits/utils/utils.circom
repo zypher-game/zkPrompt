@@ -162,16 +162,18 @@ template XorMultiple(n, m) {
     signal mids[n][m];
     mids[0] <== inputs[0];
 
-    component xors[n-1];
+    component xorByte[n-1];
     for(var i=0; i<n-1; i++) {
-        xors[i] = BitwiseXor(m);
-        xors[i].a <== mids[i];
-        xors[i].b <== inputs[i+1];
-        mids[i+1] <== xors[i].out;
+         xorByte[i] = XORBLOCK(m);
+         xorByte[i].a <== mids[i];
+         xorByte[i].b <== inputs[i+1];
+         mids[i+1] <== xorByte[i].out;
     }
 
     out <== mids[n-1];
 }
+
+
 
 // Increment a 32-bit word, represented as a 4-byte array
 //

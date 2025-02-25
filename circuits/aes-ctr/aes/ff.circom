@@ -2,7 +2,7 @@
 pragma circom 2.1.6;
 
 include "circomlib/circuits/bitify.circom";
-include "../utils.circom";
+include "../../utils/utils.circom";
 
 // All this is for a properly constrained sbox since we don't have lookup arguments
 // Finite field addition, the signal variable plus a compile-time constant

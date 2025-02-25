@@ -1,7 +1,7 @@
 pragma circom 2.1.6;
 
 include "aes/cipher.circom";
-include "utils.circom";
+include "../utils/utils.circom";
 include "gctr.circom";
 
 

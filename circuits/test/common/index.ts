@@ -173,3 +173,37 @@ export function byteArrayToHex(byteArray: any) {
       return ('0' + (byte & 0xFF).toString(16)).slice(-2);
   }).join('');
 }
+
+export function toUint32Array(buf: Uint8Array) {
+  const arr = new Uint32Array(buf.length / 4)
+  const arrView = new DataView(buf.buffer, buf.byteOffset, buf.byteLength)
+  for (let i = 0; i < arr.length; i++) {
+      arr[i] = arrView.getUint32(i * 4, true)
+  }
+  return arr
+}
+
+/**
+* Converts a Uint32Array to an array of bits.
+* LE order.
+*/
+export function uintArray32ToBits(uintArray: Uint32Array | number[]) {
+  const bits: number[][] = []
+  for (let i = 0; i < uintArray.length; i++) {
+      const uint = uintArray[i]
+      bits.push(numToBitsNumerical(uint))
+  }
+
+  return bits
+}
+
+export function numToBitsNumerical(num: number, bitCount = 32) {
+  const bits: number[] = []
+  for (let i = 2 ** (bitCount - 1); i >= 1; i /= 2) {
+      const bit = num >= i ? 1 : 0
+      bits.push(bit)
+      num -= bit * i
+  }
+
+  return bits
+}
