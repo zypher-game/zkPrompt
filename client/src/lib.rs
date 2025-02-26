@@ -62,14 +62,8 @@ mod tests {
         println!("add:{}", hex::encode(aad.as_ref()));
         println!("ct:{}", hex::encode(ct.as_ref()));
         println!("tag:{}", hex::encode(received_tag_0.as_ref()));
-        println!("pt:{}",hex::encode(pt.as_ref()) );
-        println!("pt_len:{}",pt.as_ref().len() );
-
-
-        {
-            println!("ct:{:?}", ct.as_ref());
-            println!("ct:{:?}", [71, 181, 57, 69, 174, 109, 27, 125, 171, 204, 182, 120, 89, 54, 117, 32, 191, 134, 52, 231, 144, 247, 4, 190, 20, 170, 20, 231, 168, 53, 83, 195, 61, 35, 201, 70, 229, 222, 95, 128, 104, 95, 43, 13, 205, 26, 185, 242, 100, 161, 122, 138, 200, 157, 146, 186, 222, 144, 193, 41, 136, 123, 54, 191, 232, 176, 113, 142, 249, 110, 215, 157, 203, 197, 220, 111, 242, 159, 44, 214].len());
-        }
+        println!("pt:{}", hex::encode(pt.as_ref()));
+        println!("pt_len:{}", pt.as_ref().len());
     }
 
     #[test]
