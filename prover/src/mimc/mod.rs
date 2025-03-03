@@ -1,17 +1,10 @@
-use std::{
-    marker::PhantomData,
-    ops::{Add, AddAssign, MulAssign, Sub},
-};
-
-use ark_bn254::Fr;
-use ark_ff::{One, PrimeField, Zero};
+use ark_ff::PrimeField;
 
 pub mod bn254;
-pub mod params;
 
 pub trait MiMC<F: PrimeField, const ROUNDS: usize, const EXPONENT: usize> {
     const K: F;
-    const ROUND_KEYS: [F; 220];
+    const ROUND_KEYS: [F; ROUNDS];
 
     fn permute_feistel(state: &[F], num_outputs: usize) -> Vec<F> {
         let mut r = F::zero();

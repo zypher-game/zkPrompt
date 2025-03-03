@@ -74,7 +74,7 @@ mod test {
         }"#;
 
         let msg = format!(
-            "POST /v1/chat/completions HTTP/1.1\r\n\
+        "POST /v1/chat/completions HTTP/1.1\r\n\
          Host: {}\r\n\
          Authorization: Bearer {}\r\n\
          Content-Type: application/json\r\n\

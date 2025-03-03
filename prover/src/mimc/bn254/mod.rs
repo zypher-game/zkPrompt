@@ -3,7 +3,7 @@ use ark_ff::{AdditiveGroup, MontFp};
 
 use super::MiMC;
 
-pub mod gadgets;
+pub mod constraint;
 
 #[derive(Debug, Clone)]
 pub struct MimcBn254;

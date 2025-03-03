@@ -1,11 +1,11 @@
 use anyhow::Result;
+use clap::Parser;
 use hickory_resolver::TokioAsyncResolver;
 use std::net::SocketAddr;
 use tokio::{
     io::{AsyncReadExt, AsyncWriteExt, ReadHalf, WriteHalf},
     net::{TcpListener, TcpStream},
 };
-use clap::Parser;
 
 async fn forward(mut from: ReadHalf<TcpStream>, mut to: WriteHalf<TcpStream>) -> Result<()> {
     loop {
@@ -69,7 +69,6 @@ struct Command {
     #[arg(short, long, env = "FORWARD")]
     forward: String,
 }
-
 
 #[tokio::main]
 async fn main() -> Result<()> {

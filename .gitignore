@@ -25,3 +25,5 @@ Cargo.lock
 node_modules
 
 circuits/test/*.circom
+
+circuits.json

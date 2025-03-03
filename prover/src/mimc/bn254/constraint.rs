@@ -1,6 +1,5 @@
 use super::MiMC;
 use super::MimcBn254;
-use ark_bn254::Fr;
 use ark_ff::PrimeField;
 use ark_r1cs_std::fields::{fp::FpVar, FieldVar};
 
@@ -12,7 +11,7 @@ pub struct MimcBn254Var<F: PrimeField> {
 }
 
 impl<F: PrimeField> MimcBn254Var<F> {
-    pub fn new(num_outputs: usize, round_keys: &[FpVar<F>]) -> Self {
+    pub fn new(num_outputs: usize, round_keys: &[FpVar<F>], k: FpVar<F>) -> Self {
         assert_eq!(
             round_keys.len(),
             MimcBn254::rounds(),
@@ -20,7 +19,7 @@ impl<F: PrimeField> MimcBn254Var<F> {
         );
         Self {
             num_outputs,
-            k: FpVar::zero(),
+            k,
             round_keys: round_keys.to_vec(),
         }
     }
@@ -70,12 +69,16 @@ impl<F: PrimeField> MimcBn254Var<F> {
 mod test {
     use ark_bn254::Fr;
     use ark_ff::UniformRand;
-    use ark_r1cs_std::{alloc::AllocVar, fields::fp::FpVar, R1CSVar};
+    use ark_r1cs_std::{
+        alloc::AllocVar,
+        fields::{fp::FpVar, FieldVar},
+        R1CSVar,
+    };
     use ark_relations::{ns, r1cs::ConstraintSystem};
     use ark_std::test_rng;
 
     use crate::mimc::{
-        bn254::{gadgets::MimcBn254Var, MimcBn254},
+        bn254::{constraint::MimcBn254Var, MimcBn254},
         MiMC,
     };
 
@@ -89,7 +92,7 @@ mod test {
             round_constant_vars.push(FpVar::new_constant(ns!(cs, "alloc round keys"), c).unwrap());
         }
 
-        let mimc = MimcBn254Var::new(1, &round_constant_vars);
+        let mimc = MimcBn254Var::new(1, &round_constant_vars, FpVar::zero());
         let input = Fr::rand(&mut rand);
         let input_var = FpVar::new_witness(ns!(cs, "alloc input"), || Ok(input)).unwrap();
 

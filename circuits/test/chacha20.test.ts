@@ -26,7 +26,6 @@ describe("chacha20", () => {
             in: plaintextBits,
         }, { out: ciphertextBits });
 
-        /// decryption since symmetric
         const w2 = await circuit.expectPass({
             key: uintArray32ToBits(toUint32Array(key)),
             nonce: uintArray32ToBits(toUint32Array(nonce)),
