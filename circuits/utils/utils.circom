@@ -261,7 +261,7 @@ template Contains(n) {
     out <== 1 - someEqual.out;
 }
 
-/// m is the number of arrarys, n is the length of each array
+/// m is the number of arrays, n is the length of each array
 template ArraySelector(m, n) {
     signal input in[m][n];
     signal input index;
