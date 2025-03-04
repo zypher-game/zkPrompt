@@ -15,5 +15,5 @@ pub trait ReqConstraint {
 
     fn system_prompt_key() -> Vec<u8>;
 
-    fn generate_constraints(&mut self) -> Result<(), SynthesisError>;
+    fn generate_constraints(&self) -> Result<(), SynthesisError>;
 }

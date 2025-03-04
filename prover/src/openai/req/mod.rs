@@ -9,21 +9,33 @@ use crate::utils::enforce_equals;
 
 pub mod traits;
 
-pub struct OpenaiVar<F: PrimeField> {
+pub struct ReqVar<F: PrimeField> {
     pub data_vars: Vec<UInt8<F>>,
     pub prompt_len: usize,
 }
 
-impl<F: PrimeField> OpenaiVar<F> {
+impl<F: PrimeField> ReqVar<F> {
     pub fn new(data_vars: &[UInt8<F>], prompt_len: usize) -> Self {
         Self {
             data_vars: data_vars.to_vec(),
             prompt_len,
         }
     }
+
+    pub fn prompt_start(&self) -> usize {
+        Self::req_line().len()
+            + Self::host().len()
+            + Self::authorization().len()
+            + Self::content_type().len()
+            + Self::content_length().len()
+            + Self::connection().len()
+            + 2
+            + 1
+            + Self::system_prompt_key().len()
+    }
 }
 
-impl<F: PrimeField> ReqConstraint for OpenaiVar<F> {
+impl<F: PrimeField> ReqConstraint for ReqVar<F> {
     fn req_line() -> Vec<u8> {
         format!("POST {} HTTP/1.1\r\n", env::var("URL").unwrap())
             .as_bytes()
@@ -65,7 +77,7 @@ impl<F: PrimeField> ReqConstraint for OpenaiVar<F> {
             .to_vec()
     }
 
-    fn generate_constraints(&mut self) -> Result<(), SynthesisError> {
+    fn generate_constraints(&self) -> Result<(), SynthesisError> {
         let req_line = Self::req_line();
         let host = Self::host();
         let authorization = Self::authorization();
@@ -162,7 +174,8 @@ mod test {
     use ark_bn254::Fr;
     use ark_r1cs_std::uint8::UInt8;
 
-    use crate::openai::req::{traits::ReqConstraint, OpenaiVar};
+    use super::traits::ReqConstraint;
+    use crate::openai::req::ReqVar;
 
     #[test]
     fn test_req_constraint() {
@@ -177,7 +190,7 @@ mod test {
             .map(|b| UInt8::constant(*b))
             .collect::<Vec<UInt8<Fr>>>();
 
-        let mut var = OpenaiVar::new(&byte_vars, 22);
+        let var = ReqVar::new(&byte_vars, 22);
         var.generate_constraints().unwrap();
     }
 }

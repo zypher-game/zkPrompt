@@ -26,7 +26,7 @@ impl<F: PrimeField> MimcBn254Var<F> {
 }
 
 impl<F: PrimeField> MimcBn254Var<F> {
-    pub fn permute_feistel(&self, state: &[FpVar<F>]) -> Vec<FpVar<F>> {
+    pub fn generate_constraints(&self, state: &[FpVar<F>]) -> Vec<FpVar<F>> {
         let mut r = FpVar::zero();
         let mut c = FpVar::zero();
         for s in state.iter() {
@@ -96,7 +96,7 @@ mod test {
         let input = Fr::rand(&mut rand);
         let input_var = FpVar::new_witness(ns!(cs, "alloc input"), || Ok(input)).unwrap();
 
-        let output_var = mimc.permute_feistel(&[input_var]);
+        let output_var = mimc.generate_constraints(&[input_var]);
         assert_eq!(
             output_var[0].value().unwrap().to_string().as_str(),
             "16222109634343783365645707049387040728067039469929484045209032231701032088716"
