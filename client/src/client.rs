@@ -32,7 +32,8 @@ async fn request(proxy: SocketAddr, data: &[u8]) -> Result<Vec<u8>> {
     let config = load_client_config(key_log);
 
     let connector = TlsConnector::from(config);
-    let server_name = ServerName::try_from(env::var("HOST").unwrap()).expect("Invalid server name");
+  //  let server_name = ServerName::try_from(env::var("HOST").unwrap()).expect("Invalid server name");
+  let server_name = ServerName::try_from("www.rust-lang.org").expect("Invalid server name");
     let mut tls_stream = connector.connect(server_name, proxy_stream).await?;
 
     // write request
@@ -59,6 +60,7 @@ mod test {
 
     use super::request;
 
+    // cargo test --package client --lib -- client::test::test_client_request --exact --show-output
     #[tokio::test]
     async fn test_client_request() {
         dotenv::dotenv().ok();
@@ -89,6 +91,27 @@ mod test {
         );
 
         let res = request(proxy_addr.parse().unwrap(), msg.as_bytes())
+            .await
+            .unwrap();
+        println!("{}", String::from_utf8(res).unwrap());
+    }
+
+    // cargo test --package client --lib -- client::test::test_tmp --exact --show-output
+    #[tokio::test]
+    async fn test_tmp() {
+        dotenv::dotenv().ok();
+        let proxy_addr = env::var("PROXY_ADDR").unwrap();
+
+        let msg = concat!(
+            "GET / HTTP/1.1\r\n",
+            "Host: www.rust-lang.org\r\n",
+            "Connection: close\r\n",
+            "Accept-Encoding: identity\r\n",
+            "\r\n"
+        )
+        .as_bytes();
+
+        let res = request(proxy_addr.parse().unwrap(), msg)
             .await
             .unwrap();
         println!("{}", String::from_utf8(res).unwrap());

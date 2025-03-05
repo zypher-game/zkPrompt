@@ -5,8 +5,3 @@ members = [
    "prover",    
 ]
 resolver = "2"
-
-
-
-[patch.crates-io]
-rustls = { git = "https://github.com/zypher-network/rustls", default-features = false, features = ["logging", "std", "tls12", "ring"] }
