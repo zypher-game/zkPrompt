@@ -70,6 +70,7 @@ struct Command {
     forward: String,
 }
 
+// cargo run -- --forward api.openai.com --port 9100
 #[tokio::main]
 async fn main() -> Result<()> {
     dotenv::dotenv().ok();

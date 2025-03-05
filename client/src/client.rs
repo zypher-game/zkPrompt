@@ -1,4 +1,4 @@
-use std::{net::SocketAddr, sync::Arc};
+use std::{env, net::SocketAddr, sync::Arc};
 
 use crate::key_log::KeyLogVec;
 use anyhow::Result;
@@ -9,8 +9,6 @@ use tokio::{
 };
 use tokio_rustls::TlsConnector;
 use webpki::types::ServerName;
-
-const SERVER_NAME: &str = "api.openai.com";
 
 pub fn load_client_config(key_log: Arc<KeyLogVec>) -> Arc<ClientConfig> {
     let mut roots = RootCertStore::empty();
@@ -34,7 +32,7 @@ async fn request(proxy: SocketAddr, data: &[u8]) -> Result<Vec<u8>> {
     let config = load_client_config(key_log);
 
     let connector = TlsConnector::from(config);
-    let server_name = ServerName::try_from(SERVER_NAME).expect("Invalid server name");
+    let server_name = ServerName::try_from(env::var("HOST").unwrap()).expect("Invalid server name");
     let mut tls_stream = connector.connect(server_name, proxy_stream).await?;
 
     // write request
@@ -59,33 +57,34 @@ async fn request(proxy: SocketAddr, data: &[u8]) -> Result<Vec<u8>> {
 mod test {
     use std::env;
 
-    use super::{request, SERVER_NAME};
+    use super::request;
 
     #[tokio::test]
     async fn test_client_request() {
         dotenv::dotenv().ok();
         let proxy_addr = env::var("PROXY_ADDR").unwrap();
-        let api_key = env::var("API_KEY").unwrap();
+        let content_length: usize = env::var("CONTENT_LENGTH").unwrap().parse().unwrap();
 
-        let body = r#"{
-        "model": "gpt-4o-mini",
-        "messages": [{"role": "user", "content": "Say this is a test!"}],
-        "temperature": 0.7
-        }"#;
+        let mut input = "what is your name?".to_string();
+        let body_template = r#"{{"messages":[{{"role":"system","content":"you are a zypher girl!"}},{{"role":"user","content":"{}"}}],"model":"gpt-4o-mini","temperature":0.7}}"#;
+        let padding = " ".repeat(content_length - body_template.len() - input.len() + 2);
+        input.push_str(&padding);
+        let body = body_template.replacen("{}", &input, 1);
+        assert_eq!(body.len(), content_length);
 
         let msg = format!(
-            "POST /v1/chat/completions HTTP/1.1\r\n\
-         Host: {}\r\n\
-         Authorization: Bearer {}\r\n\
-         Content-Type: application/json\r\n\
-         Content-Length: {}\r\n\
-         Connection: close\r\n\
-         \r\n\
-         {}
-         ",
-            SERVER_NAME,
-            api_key,
-            body.len(),
+            "POST {} HTTP/1.1\r\n\
+             Host:{}\r\n\
+             Authorization:Bearer {}\r\n\
+             Content-Type:application/json\r\n\
+             Content-Length:{}\r\n\
+             Connection:close\r\n\
+             \r\n\
+             {}",
+            env::var("URL").unwrap(),
+            env::var("HOST").unwrap(),
+            env::var("OPENAI_API_KEY").unwrap(),
+            env::var("CONTENT_LENGTH").unwrap(),
             body
         );
 
