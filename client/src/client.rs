@@ -33,7 +33,7 @@ async fn request(proxy: SocketAddr, data: &[u8]) -> Result<Vec<u8>> {
 
     let connector = TlsConnector::from(config);
   //  let server_name = ServerName::try_from(env::var("HOST").unwrap()).expect("Invalid server name");
-  let server_name = ServerName::try_from("www.rust-lang.org").expect("Invalid server name");
+    let server_name = ServerName::try_from("pozk-minertest.zypher.dev").expect("Invalid server name");
     let mut tls_stream = connector.connect(server_name, proxy_stream).await?;
 
     // write request
@@ -41,11 +41,12 @@ async fn request(proxy: SocketAddr, data: &[u8]) -> Result<Vec<u8>> {
 
     // read response
     let mut data = vec![];
-    let mut buffer = [0u8; 4096];
+    let mut buffer = [0u8; 8192];
     loop {
         let n = tls_stream.read(&mut buffer).await?;
         println!("n is {n}");
-        if n == 0 {
+        // FIXME if data length == 8192, add timeout for this loop
+        if n == 0 || n < 8192 {
             break;
         }
         data.extend(&buffer[..n]);
